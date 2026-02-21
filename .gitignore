@@ -1,0 +1,30 @@
+# --- Python / Backend ---
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+backend/sessions/
+sessions/
+
+# --- Node / Frontend ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+
+# --- OS / IDE ---
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.log
+
+# --- Playwright ---
+test-results/
+playwright-report/
+blob-report/
+playwright/.local-browsers
