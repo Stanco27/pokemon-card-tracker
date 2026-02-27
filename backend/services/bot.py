@@ -19,3 +19,6 @@ class TargetBot:
         self.is_running = False
 
 target_bot = TargetBot()
+
+def test_bot():
+    print("Bot test successful")

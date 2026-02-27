@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Settings, Activity, Terminal, Play, Square, Crosshair, Layers } from "lucide-react";
+import { Settings, Activity, Terminal, Play, Square, Layers, FlaskConical } from "lucide-react";
 import type { SniperConfig } from "../types";
+import { botApi } from "../api";
 
 const Dashboard: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
+  const [testResponse, setTestResponse] = useState<string | null>(null); // State for the API output
   const [config, setConfig] = useState<SniperConfig>({
     tcin: "54244241",
     interval: 5,
@@ -13,6 +15,17 @@ const Dashboard: React.FC = () => {
 
   const toggleSniper = () => {
     setIsRunning(!isRunning);
+  };
+
+  // The new Test Function
+  const handleTestApi = async () => {
+    setTestResponse("Sending request to Python...");
+    try {
+      const data = await botApi.test(config);
+      setTestResponse(JSON.stringify(data, null, 2)); // Display pretty JSON
+    } catch (err: any) {
+      setTestResponse(`Error: ${err.message}`);
+    }
   };
 
   return (
@@ -34,16 +47,26 @@ const Dashboard: React.FC = () => {
             <h1 className="text-3xl font-bold">Control Panel</h1>
             <p className="text-slate-500 text-sm">Active Profile: {config.session_id}</p>
           </div>
-          <button
-            onClick={toggleSniper}
-            className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all active:scale-95 ${
-              isRunning
-                ? "bg-slate-800 text-red-500 border border-red-500/50"
-                : "bg-red-600 text-white hover:bg-red-500 shadow-xl shadow-red-900/20"
-            }`}
-          >
-            {isRunning ? <><Square size={18} /> KILL ENGINE</> : <><Play size={18} /> RUN SNIPER</>}
-          </button>
+          <div className="flex gap-4">
+            {/* NEW TEST BUTTON */}
+            <button
+              onClick={handleTestApi}
+              className="flex items-center gap-2 px-6 py-4 rounded-xl font-bold bg-amber-600/10 text-amber-500 border border-amber-600/30 hover:bg-amber-600/20 transition-all active:scale-95"
+            >
+              <FlaskConical size={18} /> TEST CONNECTION
+            </button>
+
+            <button
+              onClick={toggleSniper}
+              className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all active:scale-95 ${
+                isRunning
+                  ? "bg-slate-800 text-red-500 border border-red-500/50"
+                  : "bg-red-600 text-white hover:bg-red-500 shadow-xl shadow-red-900/20"
+              }`}
+            >
+              {isRunning ? <><Square size={18} /> KILL ENGINE</> : <><Play size={18} /> RUN SNIPER</>}
+            </button>
+          </div>
         </header>
 
         <div className="grid grid-cols-12 gap-8 flex-1">
@@ -73,7 +96,7 @@ const Dashboard: React.FC = () => {
                     <input
                       type="number"
                       value={config.interval}
-                      onChange={(e) => setConfig({ ...config, interval: parseInt(e.target.value) })}
+                      onChange={(e) => setConfig({ ...config, interval: parseFloat(e.target.value) })}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 focus:border-red-500 outline-none transition"
                     />
                   </div>
@@ -131,8 +154,17 @@ const Dashboard: React.FC = () => {
                 <div className="w-2.5 h-2.5 rounded-full bg-slate-800"></div>
               </div>
             </div>
-            <div className="p-8 font-mono text-sm space-y-3 overflow-y-auto bg-[#020617]/50">
+            <div className="p-8 font-mono text-sm space-y-3 overflow-y-auto bg-[#020617]/50 h-full">
               <p className="text-slate-600 border-b border-slate-800 pb-2 mb-4">--- INITIALIZING POKÉMON TARGET SNIPER ---</p>
+              
+              {/* DISPLAY REAL API RESPONSE HERE */}
+              {testResponse && (
+                <div className="mb-4 p-4 bg-slate-950 border border-slate-800 rounded-lg">
+                  <p className="text-xs text-slate-500 mb-2 uppercase font-bold tracking-tighter">API Response:</p>
+                  <pre className="text-amber-400 whitespace-pre-wrap">{testResponse}</pre>
+                </div>
+              )}
+
               {isRunning ? (
                 <div className="space-y-2">
                   <p className="text-blue-400">[{new Date().toLocaleTimeString()}] Fetching Browser Context...</p>
